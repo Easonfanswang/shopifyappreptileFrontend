@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../app/styles/global.css"],
+  "sourcesContent": ["body {\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n#root {\r\n  height: 100%;\r\n}\r\n\r\n/* 移动端适配 */\r\n@media screen and (max-width: 768px) {\r\n  .ant-layout-sider {\r\n    position: absolute !important;\r\n    z-index: 100;\r\n    height: 100%;\r\n  }\r\n  \r\n  .ant-layout-sider-collapsed {\r\n    transform: translateX(-100%);\r\n  }\r\n}\r\n\r\n/* 滚动条样式 */\r\n::-webkit-scrollbar {\r\n  width: 6px;\r\n  height: 6px;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n  background: #f1f1f1;\r\n  border-radius: 3px;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n  background: #888;\r\n  border-radius: 3px;\r\n}\r\n\r\n::-webkit-scrollbar-thumb:hover {\r\n  background: #555;\r\n} "],
+  "mappings": ";AAAA;;;;AAKA;AACE;;AAIF;AACE;AACE;AACA;AACA;;AAGF;AACE;;;AAKJ;AACE;AACA;;AAGF;AACE;AA7BF;;AAiCA;AACE;AAlCF;;AAsCA;AACE;;",
+  "names": []
+}

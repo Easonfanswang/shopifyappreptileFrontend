@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Input, Button, Card, Space, List, Avatar, Spin, message } from "antd";
+import { Input, Button, Card, Space, List, Avatar, Spin } from "antd";
 import { SendOutlined, UserOutlined, RobotOutlined } from "@ant-design/icons";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";

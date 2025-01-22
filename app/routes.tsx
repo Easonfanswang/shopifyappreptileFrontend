@@ -13,4 +13,10 @@ export const routes = [
     label: "AI 聊天",
     path: "/chat",
   },
+  {
+    key: "/user",
+    icon: <UserOutlined />,
+    label: "个人中心",
+    path: "/user",
+  },
 ];

@@ -12,46 +12,24 @@ datasource db {
 
 // 用户模型
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String    // 添加密码字段
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 关联
-  chats     Chat[]     // 用户的所有对话
-  messages  Message[]  // 用户发送的所有消息
-}
-
-// 对话模型 - 表示一个完整的对话会话
-model Chat {
-  id        String   @id @default(uuid())
-  title     String?  // 对话标题
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 关联
-  userId    String   // 关联到用户
-  user      User     @relation(fields: [userId], references: [id])
-  messages  Message[] // 该对话中的所有消息
-
-  @@index([userId])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 // 消息模型 - 存储单条消息
 model Message {
-  id        String   @id @default(uuid())
-  content   String   // 消息内容
-  role      Role     // 消息角色：用户或AI
+  id        String   @id @default(cuid())
+  question  String   // 用户的问题
+  answer    String   // AI 的回答
+  userId    String?  // 修改为可选字段
+  user      User?    @relation(fields: [userId], references: [id])  // 修改为可选关系
   createdAt DateTime @default(now())
 
-  // 关联
-  chatId    String   // 关联到对话
-  chat      Chat     @relation(fields: [chatId], references: [id])
-  userId    String   // 关联到用户
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@index([chatId])
   @@index([userId])
 }
 

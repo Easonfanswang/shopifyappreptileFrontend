@@ -9,17 +9,47 @@ export const deepseek = async ({
   role,
   content,
 }: {
-  role: "system" | "user" | "assistant" | "tool";
+  role: "system" | "user" | "assistant";
   content: string;
 }) => {
   switch (role) {
     case "system":
-      const response = await openai.chat.completions.create({
-        messages: [{ role: "system", content: content }],
-        model: "deepseek-chat",
-      });
-      console.log(response);
-      console.log(response.choices[0].message.content);
-      return response.choices[0].message.content
+      try {
+        const response = await openai.chat.completions.create({
+          messages: [{ role: "system", content: content }],
+          model: "deepseek-chat",
+        });
+        return response.choices[0].message.content;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    case "user":
+      try {
+        const response = await openai.chat.completions.create({
+          messages: [{ role: "user", content: content }],
+          model: "deepseek-chat",
+        });
+        console.log(response);
+        console.log(response.choices[0].message);
+        console.log(response.choices[0].message.content);
+        return response.choices[0].message.content;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    case "assistant":
+      try {
+        const response = await openai.chat.completions.create({
+          messages: [{ role: "assistant", content: content }],
+          model: "deepseek-chat",
+        });
+        return response.choices[0].message.content;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    default:
+      return null;
   }
 };

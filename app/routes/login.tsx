@@ -8,10 +8,13 @@ import {
   useSearchParams,
 } from "@remix-run/react";
 import { prisma } from "~/utils/db.server";
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  redirect,
+} from "@remix-run/node";
 import { handlePrismaError } from "~/function/prismaErrorHandle";
 import { createUserSession, getUser } from "~/utils/session.server";
-import { redirect } from "@remix-run/node";
 
 const { Title } = Typography;
 
@@ -92,7 +95,7 @@ const LoginPage = () => {
         message.error(fetcher.data.message);
       }
     }
-  }, [fetcher.data]);
+  }, [fetcher.data, navigate]);
 
   const onFinish = async (loginFormData: any) => {
     setLoading(true);

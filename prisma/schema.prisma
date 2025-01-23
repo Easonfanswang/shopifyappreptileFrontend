@@ -14,7 +14,7 @@ datasource db {
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
-  password  String    // 添加密码字段
+  password  String // 添加密码字段
   name      String?
   messages  Message[]
   createdAt DateTime  @default(now())
@@ -24,10 +24,10 @@ model User {
 // 消息模型 - 存储单条消息
 model Message {
   id        String   @id @default(cuid())
-  question  String   // 用户的问题
-  answer    String   // AI 的回答
-  userId    String?  // 修改为可选字段
-  user      User?    @relation(fields: [userId], references: [id])  // 修改为可选关系
+  question  String // 用户的问题
+  answer    String // AI 的回答
+  userId    String? // 修改为可选字段
+  user      User?    @relation(fields: [userId], references: [id]) // 修改为可选关系
   createdAt DateTime @default(now())
 
   @@index([userId])

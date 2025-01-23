@@ -1,3 +1,4 @@
+import axios from "axios";
 import OpenAI from "openai";
 
 const openai = new OpenAI({

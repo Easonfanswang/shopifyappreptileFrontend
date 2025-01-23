@@ -1,21 +1,72 @@
 import { useState } from "react";
 import { Layout, Menu, MenuProps, Dropdown, Avatar } from "antd";
-import { Outlet, Link, useLocation } from "@remix-run/react";
+import {
+  Outlet,
+  Link,
+  useLocation,
+  useLoaderData,
+  useFetcher,
+  Form,
+} from "@remix-run/react";
 import { routes } from "../routes";
-import { UserOutlined, LoginOutlined, LogoutOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  LoginOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { getUser } from "~/utils/session.server";
 
 const { Header, Content } = Layout;
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getUser(request);
+  return json({
+    isLoggedIn: !!user,
+    user,
+  });
+};
+
 const App = () => {
+  const { isLoggedIn, user } = useLoaderData<typeof loader>();
+
+  const [isLogIn, setIsLogIn] = useState<boolean>(isLoggedIn);
+  const fetcher = useFetcher<any>();
   const location = useLocation();
   // 这里添加用户登录状态判断，根据实际情况修改
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const menuItems: MenuProps["items"] = routes.map((route) => ({
-    key: route.path,
-    icon: route.icon,
-    label: <Link to={route.path}>{route.label}</Link>,
-  }));
+  const menuItems: MenuProps["items"] = routes.map((route) => {
+    // 如果有子菜单
+    if (route.children) {
+      return {
+        key: route.key,
+        icon: route.icon,
+        label: route.label,
+        children: route.children.map((child) => ({
+          key: child.key,
+          icon: child.icon,
+          label: <Link to={child.path}>{child.label}</Link>,
+        })),
+      };
+    }
+
+    // 如果是普通菜单项
+    return {
+      key: route.key,
+      icon: route.icon,
+      label: route.path ? (
+        <Link to={route.path}>{route.label}</Link>
+      ) : (
+        route.label
+      ),
+    };
+  });
+
+  const handleLogout = () => {
+    fetcher.submit(null, { method: "POST", action: "/logout" });
+    setIsLogIn(false);
+  };
 
   // 用户下拉菜单项
   const userMenuItems: MenuProps["items"] = isLoggedIn
@@ -23,16 +74,29 @@ const App = () => {
         {
           key: "profile",
           icon: <SettingOutlined />,
-          label: <Link to="/profile">个人中心</Link>,
+          label: <Link to="/user">个人中心</Link>,
         },
         {
           key: "logout",
           icon: <LogoutOutlined />,
-          label: "退出登录",
-          onClick: () => {
-            // 处理登出逻辑
-            setIsLoggedIn(false);
-          },
+          label: (
+            <Form action="/logout" method="post">
+              <button
+                type="submit"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "inherit",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                退出登录
+              </button>
+            </Form>
+          ),
         },
       ]
     : [

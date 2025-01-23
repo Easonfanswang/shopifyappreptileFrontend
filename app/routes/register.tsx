@@ -40,7 +40,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         data: response,
       };
     } catch (error) {
-      console.error("Error appChat userMessage action:", error);
+      console.error("Error register registerFormData action:", error);
       const errorResponse = handlePrismaError(error);
       return errorResponse;
     }

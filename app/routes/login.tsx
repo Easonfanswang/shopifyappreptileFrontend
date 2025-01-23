@@ -1,14 +1,71 @@
 import { useState, useEffect } from "react";
-import { Card, Form, Input, Button, Typography } from "antd";
+import { Card, Form, Input, Button, Typography, message } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Link, useSearchParams } from "@remix-run/react";
+import {
+  Link,
+  useFetcher,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
+import { prisma } from "~/utils/db.server";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { handlePrismaError } from "~/function/prismaErrorHandle";
+import { createUserSession, getUser } from "~/utils/session.server";
+import { redirect } from "@remix-run/node";
 
 const { Title } = Typography;
+
+// 检查用户是否已登录，如果已登录则重定向到首页
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getUser(request);
+  if (user) return redirect("/");
+  return null;
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const formObject = Object.fromEntries(formData);
+
+  if ("loginFormData" in formObject) {
+    try {
+      const loginFormData = JSON.parse(formObject.loginFormData as string);
+
+      const user = await prisma.user.findFirst({
+        where: {
+          email: loginFormData.email,
+          password: loginFormData.password,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      });
+
+      if (user) {
+        // 创建用户 session 并重定向到首页
+        return createUserSession(user.id, "/");
+      } else {
+        return {
+          success: false,
+          message: "用户名或密码错误",
+        };
+      }
+    } catch (error) {
+      console.error("Error login loginFormData action:", error);
+      const errorResponse = handlePrismaError(error);
+      return errorResponse;
+    }
+  }
+  return null;
+};
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [searchParams] = useSearchParams();
+  const fetcher = useFetcher<any>();
+  const navigate = useNavigate();
 
   // 获取 URL 参数中的邮箱并设置到表单中
   useEffect(() => {
@@ -25,11 +82,29 @@ const LoginPage = () => {
     }
   }, [searchParams, form]);
 
-  const onFinish = async (values: any) => {
+  useEffect(() => {
+    if (fetcher.data) {
+      console.log(fetcher.data);
+
+      if (fetcher.data.success) {
+        navigate("/");
+      } else {
+        message.error(fetcher.data.message);
+      }
+    }
+  }, [fetcher.data]);
+
+  const onFinish = async (loginFormData: any) => {
     setLoading(true);
     try {
+      fetcher.submit(
+        {
+          loginFormData: JSON.stringify(loginFormData),
+        },
+        { method: "POST" }
+      );
       // 这里添加登录逻辑
-      console.log("登录信息:", values);
+      console.log("登录信息:", loginFormData);
     } catch (error) {
       console.error("登录失败:", error);
     } finally {
